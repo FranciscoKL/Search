@@ -1,8 +1,8 @@
+
 import axios from "axios";
 import { useState } from "react";
 import Qnojo from "../assets/transferir.png";
 import "../App.css";
-// ssh: git@github.com:FranciscoKL/Search.git
 
 const Search = () => {
   const [query, setQuery] = useState("");
@@ -10,33 +10,27 @@ const Search = () => {
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const key =
-    "f53b93574ba6b8a224a31b6714ec63fcb9f7f5d76cc382b7053c8ae4f4bb9b0c";
+  
 
   const handleSubmit = async (e) => {
-    e.prevenDefault();
+    e.preventDefault();
     if (!query) {
       return;
     }
+    setErro("");
     setLoading(true);
-
-    const URL = "https://serpapi.com/search.json";
     try {
-      const res = await axios.get(URL, {
+      const URL = 'http://localhost:4000/search'
+       
+       const res = await axios.get(URL, {
         params: {
-          q: query,
-          engine: "google",
-          google_domain: "google.com.br",
-          api_key: key,
-          hl: "pt-br",
-          gl: "br",
-          num: 10,
-        },
+          query: query
+        }
       });
-      const data = await res.json();
-      setResposta(data);
-    } catch (erro) {
-      console.error(erro);
+      setResposta(res.data.organic_results || []);
+    }
+    catch (err) {
+      console.error(err);
       setErro("Houve um erro ao fazer a busca.");
     } finally {
       setLoading(false);
@@ -59,13 +53,13 @@ const Search = () => {
         <button type="submit">Submit</button>
       </form>
       <div>
-        <ul className="conteinerResultado">
-          {erro ? (
-            <h4>{erro}</h4>
-          ) : loading ? (
-            <h4>Loading</h4>
-          ) : (
-            resposta.map((r, indice) => {
+        {erro ? (
+          <h4>{erro}</h4>
+        ) : loading ? (
+          <h4>Loading</h4>
+        ) : (
+          <ul className="conteinerResultado">
+            {resposta.map((r, indice) => {
               return (
                 <li key={indice}>
                   <a href={r.link} target="_blank" rel="noopener noreferrer">
@@ -74,9 +68,9 @@ const Search = () => {
                   <p>{r.snippet}</p>
                 </li>
               );
-            })
-          )}
-        </ul>
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );
